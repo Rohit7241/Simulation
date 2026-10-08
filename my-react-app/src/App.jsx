@@ -70,15 +70,15 @@ body{font-family:'Poppins',system-ui,sans-serif;color:#374151;background:#fff}
 .mail{font-size:11px;line-height:1.2;color:#6b7280}
 .tleft{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;color:#1c6fd6}
 .tleft.low{color:#dc2626}
-
+.sel-opt{border-color:#111827;background:#f3f4f6}
 .body{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 320px;gap:32px;padding:20px 48px 20px 24px}
 .marks{text-align:right;font-weight:600;font-size:14px;color:#1f2937}
 .marks i{display:inline-block;width:14px;height:14px;border-radius:50%;background:#111827;color:#fff;font:700 10px/14px serif;text-align:center;vertical-align:middle;margin-left:4px}
 .qno{font-size:17px;font-weight:600;margin:18px 0 14px;color:#1f2937}
 .qtxt{font-size:14.5px;line-height:1.7;white-space:pre-line;max-width:70ch}
 .ans h4{margin:30px 0 14px;font-size:13px;font-weight:500;color:#6b7280}
-.opt{display:flex;align-items:center;gap:14px;padding:14px 0;font-size:14px;cursor:pointer}
-.opt input{width:16px;height:16px;accent-color:#111827}
+.opt{display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:12px;font-size:14px;cursor:pointer;border:1px solid #d1d5db;border-radius:8px;background:#fff}
+.opt:hover{border-color:#111827}
 
 .bar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid #e5e7eb;flex-shrink:0;background:#fff}
 .bar .sp{flex:1;font-size:12px;color:#9ca3af}
@@ -308,7 +308,7 @@ export default function App() {
               <div className="marks">Total Marks: 1 <i>i</i></div>
               <h4>Answer</h4>
               {q.o.map((opt, i) => (
-                <label key={i} className="opt">
+                <label key={i} className={`opt ${answers[idx] === i ? "sel-opt" : ""}`}>
                   <input
                     type="radio"
                     name={`q${idx}`}
