@@ -47,6 +47,7 @@ const QUESTIONS = [
 
 const N = QUESTIONS.length;
 const SECONDS = 60;
+const TEAM_ID = "1145356-U314WV2H";
 
 /* ---------- STYLES ---------- */
 const css = `
@@ -56,8 +57,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:#374151;background:#fff}
 :fullscreen{background:#fff}
 
 .page{height:100vh;width:100vw;display:flex;justify-content:center;background:#eef2f7;overflow:hidden}
-.shell{width:min(1100px,82vw);height:100vh;display:flex;flex-direction:column;background:#fff;box-shadow:0 0 0 1px #e5e7eb}
-.top{background:#fff;flex-shrink:0}
+.shell{width:100vw;height:100vh;display:flex;flex-direction:column;background:#fff}.top{background:#fff;flex-shrink:0}
 .row1{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 24px}
 .nav{display:flex;align-items:center;justify-content:center;gap:28px;padding:0 48px}
 .sel{border:none;background:transparent;font:500 13px Poppins,sans-serif;color:#4b5563;cursor:pointer}
@@ -70,25 +70,32 @@ body{font-family:'Poppins',system-ui,sans-serif;color:#374151;background:#fff}
 .mail{font-size:11px;line-height:1.2;color:#6b7280}
 .tleft{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;color:#1c6fd6}
 .tleft.low{color:#dc2626}
-.sel-opt{border-color:#111827;background:#f3f4f6}
-.body{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 320px;gap:32px;padding:20px 48px 20px 24px}
-.marks{text-align:right;font-weight:600;font-size:14px;color:#1f2937}
-.marks i{display:inline-block;width:14px;height:14px;border-radius:50%;background:#111827;color:#fff;font:700 10px/14px serif;text-align:center;vertical-align:middle;margin-left:4px}
-.qno{font-size:17px;font-weight:600;margin:18px 0 14px;color:#1f2937}
+
+.body{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr}.qpane{position:relative;overflow:hidden;background:#f1f3f5}
+.qin{position:relative;z-index:2;height:100%;overflow:auto;padding:20px 32px}
+.qhead{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
+.qno{font-size:17px;font-weight:600;color:#1f2937}
+.marks{font-weight:600;font-size:14px;color:#1f2937}
 .qtxt{font-size:14.5px;line-height:1.7;white-space:pre-line;max-width:70ch}
-.ans h4{margin:30px 0 14px;font-size:13px;font-weight:500;color:#6b7280}
+.ans{background:#fff;overflow:auto;padding:20px 32px;border-left:1px solid #e5e7eb}
+.ans h4{margin:18px 0 14px;font-size:14px;font-weight:600;color:#374151}
 .opt{display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:12px;font-size:14px;cursor:pointer;border:1px solid #d1d5db;border-radius:8px;background:#fff}
 .opt:hover{border-color:#111827}
+.opt input{width:16px;height:16px;accent-color:#111827;flex-shrink:0}
+.sel-opt{border-color:#111827;background:#f3f4f6}
 
-.bar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid #e5e7eb;flex-shrink:0;background:#fff}
-.bar .sp{flex:1;font-size:12px;color:#9ca3af}
-.btn{background:#111827;color:#fff;border:none;border-radius:20px;padding:8px 24px;font:500 13px Poppins,sans-serif;cursor:pointer}
-.btn.ghost{background:#fff;color:#111827;border:1px solid #111827}
+.bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 24px;border-top:1px solid #e5e7eb;flex-shrink:0;background:#fff}
+.barr{display:flex;align-items:center;justify-content:flex-end;gap:22px}
+.team{font-size:13px;color:#4b5563}
+.btn{background:#111827;color:#fff;border:none;border-radius:20px;padding:8px 26px;font:500 13px Poppins,sans-serif;cursor:pointer}
+.btn.red{background:#dc2626;justify-self:start}
+.btn.sub{background:#9ca3af}
+.link{background:none;border:none;font:500 13px Poppins,sans-serif;color:#374151;cursor:pointer;padding:0}
+.link:disabled{opacity:.4;cursor:not-allowed}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-.clear{background:none;border:none;color:#1e3a8a;text-decoration:underline;cursor:pointer;font-size:13px}
 
-/* Watermark: tilted, covers the whole screen */
-.wmwrap{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;pointer-events:none;z-index:50}
+/* Watermark: tilted, only over the question pane */
+.wmwrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
 .wm{position:absolute;top:50%;left:50%;width:150vmax;height:150vmax;transform:translate(-50%,-50%) rotate(-18deg);
   display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));grid-auto-rows:70px;user-select:none}
 .wm div{display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;line-height:1.35;color:rgba(55,65,81,.2)}
@@ -107,7 +114,8 @@ body{font-family:'Poppins',system-ui,sans-serif;color:#374151;background:#fff}
 
 @media(max-width:800px){
   .shell{width:100vw}
-  .body{grid-template-columns:1fr;padding:16px}
+  .body{grid-template-columns:1fr;overflow:auto}
+  .qpane{min-height:240px}
   .row1{grid-template-columns:1fr;gap:8px}
   .nav{flex-wrap:wrap;gap:8px;padding:0}
   .band{grid-template-columns:1fr;gap:4px;justify-items:center}
@@ -208,7 +216,6 @@ export default function App() {
   return (
     <>
       <style>{css}</style>
-      {stage !== "start" && <Watermark user={user} />}
 
       {stage === "start" && (
         <div className="center">
@@ -300,43 +307,41 @@ export default function App() {
           </div>
 
           <div className="body">
-            <div>
-              <div className="qno">Question {idx + 1}.</div>
-              <div className="qtxt">{q.q}</div>
+              <div className="qpane">
+                <Watermark user={user} />
+                <div className="qin">
+                  <div className="qhead">
+                    <span className="qno">Question {idx + 1}.</span>
+                    <span className="marks">Marks : 1.00</span>
+                  </div>
+                  <div className="qtxt">{q.q}</div>
+                </div>
+              </div>
+              <div className="ans">
+                <h4>Answer</h4>
+                {q.o.map((opt, i) => (
+                  <label key={i} className={`opt ${answers[idx] === i ? "sel-opt" : ""}`}>
+                    <input
+                      type="radio"
+                      name={`q${idx}`}
+                      checked={answers[idx] === i}
+                      onChange={() => setAnswers({ ...answers, [idx]: i })}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
             </div>
-            <div className="ans">
-              <div className="marks">Total Marks: 1 <i>i</i></div>
-              <h4>Answer</h4>
-              {q.o.map((opt, i) => (
-                <label key={i} className={`opt ${answers[idx] === i ? "sel-opt" : ""}`}>
-                  <input
-                    type="radio"
-                    name={`q${idx}`}
-                    checked={answers[idx] === i}
-                    onChange={() => setAnswers({ ...answers, [idx]: i })}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          </div>
 
-          <div className="bar">
-            <button
-              className="clear"
-              onClick={() => {
-                const a = { ...answers };
-                delete a[idx];
-                setAnswers(a);
-              }}
-            >
-              Clear
-            </button>
-            <button className="btn ghost" onClick={prev} disabled={idx === 0}>Previous</button>
-            <button className="btn" onClick={next}>Next</button>
-            <span className="sp">Round {round} · Press Esc to exit</span>
-            <button className="btn ghost" onClick={endTest}>Submit Section</button>
-          </div>
+            <div className="bar">
+              <button className="btn red" onClick={endTest}>Finish</button>
+              <span className="team">Team ID: {TEAM_ID}</span>
+              <div className="barr">
+                <button className="link" onClick={prev} disabled={idx === 0}>‹ Previous</button>
+                <button className="link" onClick={next}>Skip ›</button>
+                <button className="btn sub" onClick={endTest}>Submit</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
